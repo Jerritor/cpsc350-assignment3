@@ -54,10 +54,8 @@ GenStack<T>::~GenStack() //default constructor
 template <class T>
 void GenStack<T>::push(T d)
 {
-	//check if stack is full
-	if (size-1 != top)
+	if (size-1 == top) //if stack is full, resize
 	{
-		//if so, resize
 		int newsize = size+50; //increase size by this amount
 
 		T *newArray = new T[newsize];
@@ -93,6 +91,11 @@ T GenStack<T>::pop()
 	{
 		T temp = myArray[top--];
 		return temp;
+	}
+	else
+	{
+		throw "Stack Empty Exception";
+		return 0;
 	}
 
 	//OTHER VERSION
