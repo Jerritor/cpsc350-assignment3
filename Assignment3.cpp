@@ -182,7 +182,7 @@ void Assignment3::analyzeFile(string f)
 			else if (isCorrect == -4)
 				cout << "Reached end of file: missing ]" << endl;
 			else if (isCorrect < -4)
-				cout << "Error on line " << abs(isCorrect+5) << ": expected bracket and found " << getOpposite(missingBracket) << endl;
+				cout << "Error on line " << abs(isCorrect+5) << ": expected " << getOpposite(missingBracket) << " bracket" << endl;
 			else
 				cout << "Error on line " << isCorrect << endl;
 		}
