@@ -6,7 +6,9 @@
 
 using namespace std;
 
-char missingBracket;
+char missingBracket; //holds value of latest bracket, used for error check
+bool noMatch = false; //used to check wrong bracket error
+char lastBracket; //used if wrong bracket error
 
 //PRIVATE
 bool Assignment3::checkFile(string f) //true = readible
@@ -18,7 +20,7 @@ bool Assignment3::checkFile(string f) //true = readible
 		cout << "File Inputted: " << fn << endl;
 	else //not .cpp file
 	{
-		cout << "Inputted a non .cpp file." << endl;
+		cout << "Inputted a non .cpp file (or lacks extension)." << endl;
 		cout << "Please input a proper .cpp file (including extension) to analyze" << endl;
 		return false;
 		exit(1);
@@ -52,7 +54,7 @@ int Assignment3::checkSyntax(string f)
 
 	while(getline(inputfile, currentline))
 	{
-		cout << "Line " << ++line << ": " << currentline << "#" << endl;
+		//cout << "Line " << ++line << ": " << currentline << "#" << endl;
 
 		bool singlecomment = false; //sees if bracket is in a comment
 		bool strline = false;
@@ -67,38 +69,60 @@ int Assignment3::checkSyntax(string f)
 
 			if (!singlecomment && !strline) //if singlecomment is true, rest of line is part of a comment
 			{
+				missingBracket = curr;
+
 				if (curr == '(' || curr == '{' || curr == '[') //Opening Brackets
 				{
 					myStack.push(curr);
-					missingBracket = curr;
 					openBracketLine = line; //setting line of open bracket
-					cout << curr << endl;
+					//cout << curr << endl;
 				}
 				else if (curr == ')')
 				{
-					cout << curr << endl;
-					missingBracket = curr;
-					if (myStack.isEmpty()) return -openBracketLine-4; //nothing to match with
+					//cout << curr << endl;
+					if (myStack.isEmpty()) //nothing to match with
+					{
+						noMatch = true; //no closing bracket
+						return line; //line of last open bracket
+					}
 
-					if (myStack.peek() != '(') return line; //wrong matching bracket
+					if (myStack.peek() != '(')
+					{
+						expectedBracket = getOpposite(myStack.peek());
+						return line; //wrong matching bracket
+					}
 					myStack.pop();
 				}
 				else if (curr == '}')
 				{
-					cout << curr << endl;
-					missingBracket = curr;
-					if (myStack.isEmpty()) return -openBracketLine-4; //nothing to match with
+					//cout << curr << endl;
+					if (myStack.isEmpty()) //nothing to match with
+					{
+						noMatch = true; //no closing bracket
+						return line; //line of last open bracket
+					}
 
-					if (myStack.peek() != '{') return line; //wrong matching bracket
+					if (myStack.peek() != '{')
+					{
+						expectedBracket = getOpposite(myStack.peek());
+						return line; //wrong matching bracket
+					}
 					myStack.pop();
 				}
 				else if (curr == ']')
 				{
-					cout << curr << endl;
-					missingBracket = curr;
-					if (myStack.isEmpty()) return -openBracketLine-4; //nothing to match with
+					//cout << curr << endl;
+					if (myStack.isEmpty()) //nothing to match with
+					{
+						noMatch = true; //no closing bracket
+						return line; //line of last open bracket
+					}
 
-					if (myStack.peek() != '[') return line; //wrong matching bracket
+					if (myStack.peek() != '[')
+					{
+						expectedBracket = getOpposite(myStack.peek());
+						return line; //wrong matching bracket
+					}
 					myStack.pop();
 				}
 
@@ -120,7 +144,7 @@ int Assignment3::checkSyntax(string f)
 			}
 
 		}
-		cout << "#######" << endl;
+		//cout << "==========" << endl;
 	}
 
 	inputfile.close();
@@ -181,10 +205,11 @@ void Assignment3::analyzeFile(string f)
 				cout << "Reached end of file: missing }" << endl;
 			else if (isCorrect == -4)
 				cout << "Reached end of file: missing ]" << endl;
-			else if (isCorrect < -4)
-				cout << "Error on line " << abs(isCorrect+5) << ": expected " << getOpposite(missingBracket) << " bracket" << endl;
+			else if (noMatch) //isCorrect >= 0 for the following ifs
+				cout << "Error: Missing " << getOpposite(missingBracket) << " or an extra " << missingBracket << " exists." << endl;
+				//cout << "Error on line " << abs(isCorrect) << ": expected " << getOpposite(missingBracket) << " bracket" << endl;
 			else
-				cout << "Error on line " << isCorrect << endl;
+				cout << "Error on line " << isCorrect << ": expected " << expectedBracket << " and found " << missingBracket << endl;
 		}
 	}
 }

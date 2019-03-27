@@ -15,4 +15,6 @@ class Assignment3
 		char getOpposite(char c);
 
 		char missingBracket;
+		bool noMatch;
+		char expectedBracket;
 };
